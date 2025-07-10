@@ -1,16 +1,15 @@
+#importing all necessary libraries
 import os
 import pickle
 import logging
 from typing import List, Dict, Any, Tuple
-
 import numpy as np
 from pathlib import Path
 import re
 import PyPDF2
-
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS #stores vector embeddings and allows fast retrieval.
 from langchain.docstore.document import Document
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
@@ -21,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv() # to load my open ai api key
 
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
@@ -31,10 +30,10 @@ llm = OpenAI(openai_api_key=api_key, temperature=0.1, max_tokens=1000)
 
 
 class RAGSystem:
-    def __init__(self, papers_folder: str = "papers"):
+    def __init__(self, papers_folder: str = "papers"): #sees inside paper folder to find the pdfs
         self.papers_folder = papers_folder
         self.documents = []
-        self.vector_store = None
+        self.vector_store = None #FAISS DB storing embeddings
         self.retriever = None
         self.qa_chain = None
         
@@ -43,14 +42,14 @@ class RAGSystem:
         )
         
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,
+            chunk_size=800, #breaks long documents into chunks of 800 characters, with 400-character overlap (to have conntext) to avoid cutting important content mid-way
             chunk_overlap=400,
             separators=["\n\n\n", "\n\n", "\n", ". ", "? ", "! ", "; ", ", ", " ", ""],
             length_function=len,
         )
 
     def extract_text_from_pdf(self, pdf_path: str) -> str:
-        text = ""
+        text = "" #used to accumulate all the cleaned text from the pdf
         try:
             with open(pdf_path, 'rb') as file:
                 pdf_reader = PyPDF2.PdfReader(file)
@@ -59,9 +58,9 @@ class RAGSystem:
                     try:
                         page_text = page.extract_text()
                         if page_text:
-                            cleaned_page = self.clean_page_text(page_text)
+                            cleaned_page = self.clean_page_text(page_text) #to remove visuals from the page
                             if cleaned_page.strip():
-                                text += cleaned_page + "\n\n"
+                                text += cleaned_page + "\n\n" #to remove line breaks
                     except Exception as e:
                         logger.warning(f"Failed to extract text from page {page_num + 1}: {e}")
                         continue

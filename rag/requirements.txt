@@ -1,0 +1,27 @@
+# streamlit
+# langchain
+# faiss-cpu
+# sentence-transformers
+# PyPDF2
+# pdfplumber
+# openai
+# numpy
+# pandas
+# plotly
+# pickle-mixin
+# PyPDF2
+
+streamlit
+pandas
+plotly
+langchain
+langchain-openai
+langchain-huggingface
+langchain-community
+faiss-cpu
+sentence-transformers
+PyPDF2
+pdfplumber
+numpy
+plotly
+PyPDF2
